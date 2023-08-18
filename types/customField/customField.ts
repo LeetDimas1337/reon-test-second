@@ -3,7 +3,7 @@ export type CustomField = {
     field_name?: string,
     field_code?: string | null,
     field_type?: string,
-    values?: Array<CustomFieldValues>
+    values: Array<CustomFieldValues>
 }
 
 type CustomFieldValues = {

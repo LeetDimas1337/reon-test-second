@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import config from "../config";
 import querystring from "querystring";
 import fs from "fs";
@@ -8,6 +8,7 @@ import {
     getUserLogger
 } from "../logger";
 import log4js from "log4js"
+import {Contact} from "../types/embeddedEntities/embeddedEntities";
 
 
 axiosRetry(axios, {retries: 3, retryDelay: axiosRetry.exponentialDelay});
@@ -128,6 +129,7 @@ class AmoCRM extends Api {
         }).then((res) => res.data)
     })
 
+
     getDeal = this.authChecker((id, withParam = []) => {
         return axios
             .get(
@@ -165,5 +167,7 @@ class AmoCRM extends Api {
             .then((res) => res.data);
     });
 }
+
+
 
 export default AmoCRM; 
