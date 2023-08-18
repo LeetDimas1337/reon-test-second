@@ -1,4 +1,4 @@
-import { Customfield } from '../customField/customField'
+import { CustomField } from '../customField/customField'
 
 //response for GET /api/v4/customers/segments/{id}
 
@@ -9,7 +9,7 @@ export type CustomerSegment = {
   name: string,
   customers_count: number,
   color: string,
-  custom_fields_values: Array<Customfield> | null,
+  custom_fields_values: Array<CustomField> | null,
   available_products_price_types: Array<number> | null,
   account_id: number,
   _links: {
@@ -25,7 +25,7 @@ export type CreatedCustomerSegment = {
   name?: string,
   available_products_price_types?: Array<number> | null,
   color?: string,
-  custom_fields_values: Array<Customfield> | null
+  custom_fields_values: Array<CustomField> | null
 }
 
 
@@ -35,5 +35,5 @@ export type EditedCustomerSegment = {
   name?: string,
   available_products_price_types?: Array<number> | null,
   color?: string,
-  custom_fields_values: Array<Customfield> | null
+  custom_fields_values: Array<CustomField> | null
 }

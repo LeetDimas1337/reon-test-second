@@ -45,7 +45,7 @@ class AmoCRM extends Api {
                 this.logger.error(err.response.data);
                 const data = err.response.data;
                 if ('validation-errors' in data) {
-                    // data['validation-errors'].forEach(({ errors }) => logger.error(errors))
+                    //data['validation-errors'].forEach(({ errors }) => logger.error(errors))
                     this.logger.error('args', JSON.stringify(args, null, 2))
                 }
                 if (data.status == 401 && data.title === "Unauthorized") {
@@ -62,8 +62,8 @@ class AmoCRM extends Api {
             .post(`${this.ROOT_PATH}/oauth2/access_token`, {
                 client_id: config.CLIENT_ID,
                 client_secret: config.CLIENT_SECRET,
-                grant_type: "authorization_CODE",
-                CODE: this.CODE,
+                grant_type: "authorization_code",
+                code: this.CODE,
                 redirect_uri: config.REDIRECT_URI,
             })
             .then((res) => {
@@ -83,8 +83,8 @@ class AmoCRM extends Api {
         try {
             const content = fs.readFileSync(this.AMO_TOKEN_PATH).toString();
             const token = JSON.parse(content);
-            this.ACCESS_TOKEN = token.ACCESS_TOKEN;
-            this.REFRESH_TOKEN = token.REFRESH_TOKEN;
+            this.ACCESS_TOKEN = token.access_token;
+            this.REFRESH_TOKEN = token.refresh_token;
             return Promise.resolve(token);
         } catch (error) {
             this.logger.error(`Ошибка при чтении файла ${this.AMO_TOKEN_PATH}`, error);

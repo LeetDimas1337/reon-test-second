@@ -1,5 +1,5 @@
 import {Tag , Customer, Lead, CatalogElement, Contact} from '../embeddedEntities/embeddedEntities';
-import { Customfield } from '../customField/customField'
+import { CustomField } from '../customField/customField'
 
 // request for  GET  /api/v4/companies/id
 
@@ -13,7 +13,7 @@ export type Company = {
     created_at: number,
     updated_at: number,
     closest_task_at: number | null,
-    custom_fields_values?: Array<Customfield> | null,
+    custom_fields_values?: Array<CustomField> | null,
     is_deleted?: boolean,
     account_id: number,
     _links: {
@@ -39,7 +39,7 @@ export type CreatedCompany = {
     updated_by?: number,
     created_at?: number,
     updated_at?: number,
-    custom_fields_values?: Array<Customfield> | null,
+    custom_fields_values?: Array<CustomField> | null,
     _embedded?: {
         tags?: Array<Tag>
     },

@@ -1,4 +1,4 @@
-import { Customfield } from '../customField/customField'
+import { CustomField } from '../customField/customField'
 
 // response to a request GET /api/v4/catalogs/{catalog_id}/elements/{id}
 
@@ -12,7 +12,7 @@ export type CatalogElement = {
     created_at: number,
     updated_at: number,
     is_deleted: boolean | null,
-    custom_fields_values?: Array<Customfield> | null,
+    custom_fields_values?: Array<CustomField> | null,
     account_id: number,
     _links: {
         self?: {
@@ -25,7 +25,7 @@ export type CatalogElement = {
 
 export type CreatedCatalogElement = {
     name: string,
-    custom_fields_values: Array<Customfield> | null,
+    custom_fields_values: Array<CustomField> | null,
     request_id?: string
 }
 
@@ -34,7 +34,7 @@ export type CreatedCatalogElement = {
 export type EditedCatalogElement = {
     id?: number,
     name: string,
-    custom_fields_values?: Array<Customfield> | null,
+    custom_fields_values?: Array<CustomField> | null,
     request_id?: string
 }
 

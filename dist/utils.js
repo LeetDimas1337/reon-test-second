@@ -15,7 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getHuminizeTimeFromUnix = exports.getUniqNumbers = exports.getTodayDateTime = exports.bulkOperation = exports.getSanationMultiselectFields = exports.analyzePatientSanation = exports.getDateUnixValue = exports.getUnixBithdate = exports.makeField = exports.getAllPages = exports.getFieldValues = exports.getFieldValue = exports.getClearPhoneNumber = void 0;
 const moment_1 = __importDefault(require("moment"));
 const fs_1 = __importDefault(require("fs"));
-const constants_1 = require("../../IDENT/IDENT_v.4/server/constants");
+// import { serverPatientSanation } from "../../IDENT/IDENT_v.4/server/@types/ident-patients-type";
+// import { SANATION_ENUM_ID } from "../../IDENT/IDENT_v.4/server/constants";
 const getTodayDateTime = () => (0, moment_1.default)().format("YYYY-MM-DD HH:MM:ss");
 exports.getTodayDateTime = getTodayDateTime;
 const getClearPhoneNumber = (tel) => {
@@ -113,7 +114,7 @@ exports.analyzePatientSanation = analyzePatientSanation;
 /**
  * Функция возвращает мультисписковое поле для карточки контакта "Информация о санации"
  */
-const getSanationMultiselectFields = (field_id, patientSanation, sanationEnumIds = constants_1.SANATION_ENUM_ID) => {
+const getSanationMultiselectFields = (field_id, patientSanation, sanationEnumIds = SANATION_ENUM_ID) => {
     if (!patientSanation) {
         return undefined;
     }

@@ -1,8 +1,9 @@
 import moment from "moment";
 import fs from "fs";
-import { customField, requestParameters, custom_fields, createdDealResponse } from "../../IDENT/IDENT_v.4/server/@types/amo-types";
-import { serverPatientSanation } from "../../IDENT/IDENT_v.4/server/@types/ident-patients-type";
-import { SANATION_ENUM_ID } from "../../IDENT/IDENT_v.4/server/constants";
+import {custom_fields, createdDealResponse} from "@types/amo-types";
+import {CustomField} from './types/customField/customField'
+// import { serverPatientSanation } from "../../IDENT/IDENT_v.4/server/@types/ident-patients-type";
+// import { SANATION_ENUM_ID } from "../../IDENT/IDENT_v.4/server/constants";
 
 const getTodayDateTime = ():string => moment().format("YYYY-MM-DD HH:MM:ss");
 
@@ -14,7 +15,7 @@ const getClearPhoneNumber = (tel:string | undefined) => {
 	return clearNumber.length > 10 ? clearNumber.join("").slice(1) : clearNumber.join("");
 };
 
-const getFieldValue = (customFields:Array<customField | custom_fields>, fieldId:number) => {
+const getFieldValue = (customFields:Array<CustomField | custom_fields>, fieldId:number) => {
     const field = customFields
         ? customFields.find((item) => String(item.field_id || item.id) === String(fieldId))
         : undefined;
@@ -22,7 +23,7 @@ const getFieldValue = (customFields:Array<customField | custom_fields>, fieldId:
     return value;
 };
 
-const getFieldValues = (customFields:Array<customField | custom_fields>, fieldId:number) => {
+const getFieldValues = (customFields:Array<CustomField | custom_fields>, fieldId:number) => {
     const field = customFields
         ? customFields.find((item) => String(item.field_id || item.id) === String(fieldId))
         : undefined;

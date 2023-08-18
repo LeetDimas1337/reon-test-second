@@ -1,5 +1,5 @@
 import {Tag , Company, Customer, Lead, CatalogElement} from '../embeddedEntities/embeddedEntities';
-import { Customfield } from '../customField/customField'
+import { CustomField } from '../customField/customField'
 
 export type Contact = {
     id: number,
@@ -15,7 +15,7 @@ export type Contact = {
     is_deleted?: boolean,
     is_unsorted?: boolean,
     closest_task_at: number | null,
-    custom_fields_values?: Array<Customfield> | null,
+    custom_fields_values?: Array<CustomField> | null,
     account_id: number,
     _links: {
         self: {
@@ -43,7 +43,7 @@ export type CreatedContact = {
     updated_by?: number,
     created_at?: number,
     updated_at?: number,
-    custom_fields_values?: Array<Customfield> | null,
+    custom_fields_values?: Array<CustomField> | null,
     _embedded?: {
         tags?: Array<Tag>
     },

@@ -1,5 +1,5 @@
 import {Tag , Company,  CatalogElement, Contact} from '../embeddedEntities/embeddedEntities';
-import { Customfield } from '../customField/customField'
+import { CustomField } from '../customField/customField'
 
 // response for request GET /api/v4/leads/{id}
 
@@ -19,7 +19,7 @@ export type LeadData = {
     closed_at?: number | null,
     closest_task_at?: null,
     is_deleted?: boolean,
-    custom_fields_values?: Array<Customfield> | null,
+    custom_fields_values?: Array<CustomField> | null,
     score?: number | null,
     source_id?: number | null,
     account_id?: number,

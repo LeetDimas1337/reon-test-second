@@ -1,12 +1,12 @@
-export type Customfield = {
+export type CustomField = {
     field_id?: number,
     field_name?: string,
     field_code?: string | null,
     field_type?: string,
-    values?: Array<CustomfieldValues>
+    values?: Array<CustomFieldValues>
 }
 
-type CustomfieldValues = {
+type CustomFieldValues = {
     value?: string | boolean | number,
     enum_id?: number,
     enum?: string,
