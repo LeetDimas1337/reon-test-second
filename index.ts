@@ -56,7 +56,7 @@ amo.getAccessToken().then(() => {
                 throw new Error("К сделке не прикреплено ни одного контакта")
             }
 
-            const {custom_fields_values: contactData} = await amo.getContact(mainContact.id) as Contact
+            const {custom_fields_values: contactData} = await amo.getContact(mainContact.id)
 
             if (!contactData) {
                 throw new Error("У контакта не указана стоимость услуг")

@@ -8,8 +8,8 @@ import {
     getUserLogger
 } from "../logger";
 import log4js from "log4js"
-import {Contact} from "../types/embeddedEntities/embeddedEntities";
 import {LeadData} from "../types/lead/lead";
+import {Contact} from "../types/contacts/contact";
 import {CreatedTask} from "../types/task/task";
 import {AccountSettings} from "../types/accountSettings/accountSettings";
 
@@ -180,7 +180,7 @@ class AmoCRM extends Api {
                 },
             }).then((res) => res.data)
     })
-    
+
 }
 
 
