@@ -36,6 +36,7 @@ amo.getAccessToken().then(() => {
 
     app.post('/deal-hook', async (req: TypedRequestBody<DealHookBody>, res: Response) => {
         try {
+            console.log('Hook')
             const [deal] = (req.body.leads.update || req.body.leads.add)
             const {contacts} = (await amo.getDeal(deal.id, ['contacts']))._embedded
             const mainContact = contacts.find((contact: EmbeddedContact) => contact.is_main)
@@ -44,7 +45,7 @@ amo.getAccessToken().then(() => {
                 throw new Error("К сделке не прикреплено ни одного контакта")
             }
 
-            const contactData = (await amo.getContact(mainContact.id) as Contact).custom_fields_values
+            const {custom_fields_values: contactData} = await amo.getContact(mainContact.id) as Contact
 
             if (!contactData) {
                 throw new Error("У контакта не указана стоимость услуг")
@@ -53,18 +54,18 @@ amo.getAccessToken().then(() => {
             const services = deal.custom_fields.find((customField) => customField.id === SERVICES_LIST_ID)
 
             if (!services) {
-                throw new Error("В сделке не выбрана ни одна услуга")
+                await amo.updateDeal({id: Number(deal.id), price: 0})
+                return res.json({message: 'OK'})
             }
             const price = countDealPrice(services.values, contactData)
 
             if (price !== Number(deal.price))
                 await amo.updateDeal({id: Number(deal.id), price})
 
-            return res.json({message: "OK"})
+            return res.json({message: 'OK'})
 
         } catch (e: unknown) {
-            console.log(e)
-            res.json({message: "За сделкой не закреплено ни одного контакта"})
+            mainLogger.error((e as Error).message)
         }
 
     })
