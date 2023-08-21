@@ -23,10 +23,16 @@ const amo = new AmoCRM(config.SUB_DOMAIN, config.AUTH_CODE)
 const countDealPrice = (selectedServicesList: CustomFieldValue[], contactPrices: CustomField[]) => {
     return selectedServicesList.reduce((price, {value}) => {
         const servicePrice = contactPrices.find((contactPrice) => contactPrice.field_name === value)
-        if (!servicePrice)
-            throw new Error("У контакта не указана стоимость одной из услуг")
+        if (!servicePrice) {
+            return price
+        }
+        // throw new Error("У контакта не указана стоимость одной из услуг")
         return price + Number(servicePrice.values[0].value)
     }, 0)
+}
+
+const createTask = () => {
+
 }
 
 
@@ -36,7 +42,6 @@ amo.getAccessToken().then(() => {
 
     app.post('/deal-hook', async (req: TypedRequestBody<DealHookBody>, res: Response) => {
         try {
-            console.log('Hook')
             const [deal] = (req.body.leads.update || req.body.leads.add)
             const {contacts} = (await amo.getDeal(deal.id, ['contacts']))._embedded
             const mainContact = contacts.find((contact: EmbeddedContact) => contact.is_main)
@@ -69,6 +74,7 @@ amo.getAccessToken().then(() => {
         }
 
     })
+
 
     app.listen(config.PORT, () => {
         mainLogger.debug('Server started on', config.PORT)
