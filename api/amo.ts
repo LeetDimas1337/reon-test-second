@@ -10,6 +10,8 @@ import {
 import log4js from "log4js"
 import {Contact} from "../types/embeddedEntities/embeddedEntities";
 import {LeadData} from "../types/lead/lead";
+import {CreatedTask} from "../types/task/task";
+import {AccountSettings} from "../types/accountSettings/accountSettings";
 
 
 axiosRetry(axios, {retries: 3, retryDelay: axiosRetry.exponentialDelay});
@@ -122,8 +124,10 @@ class AmoCRM extends Api {
             });
     };
 
-    getAccountData = this.authChecker(() => {
-        return axios.get<any>(`${this.ROOT_PATH}/api/v4/account`, {
+    getAccountData = this.authChecker((withParam: string[] = []) => {
+        return axios.get<AccountSettings>(`${this.ROOT_PATH}/api/v4/account?${querystring.encode({
+            with: withParam.join(","),
+        })}`, {
             headers: {
                 Authorization: `Bearer ${this.ACCESS_TOKEN}`,
             },
@@ -133,7 +137,7 @@ class AmoCRM extends Api {
 
     getDeal = this.authChecker((id, withParam = []) => {
         return axios
-            .get(
+            .get<LeadData>(
                 `${this.ROOT_PATH}/api/v4/leads/${id}?${querystring.encode({
                     with: withParam.join(","),
                 })}`,
@@ -149,7 +153,7 @@ class AmoCRM extends Api {
     // Получить контакт по id
     getContact = this.authChecker((id) => {
         return axios
-            .get(`${this.ROOT_PATH}/api/v4/contacts/${id}`, {
+            .get<Contact>(`${this.ROOT_PATH}/api/v4/contacts/${id}`, {
                 headers: {
                     Authorization: `Bearer ${this.ACCESS_TOKEN}`,
                 },
@@ -176,6 +180,7 @@ class AmoCRM extends Api {
                 },
             }).then((res) => res.data)
     })
+    
 }
 
 
