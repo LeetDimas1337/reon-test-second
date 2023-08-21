@@ -1,6 +1,6 @@
 import {Contact} from "../types/embeddedEntities/embeddedEntities";
 
-interface DealResponse {
+type DealResponse = {
     _embedded: {
         contacts: Array<Contact>
     }
