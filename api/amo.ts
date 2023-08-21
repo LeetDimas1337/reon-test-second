@@ -168,7 +168,14 @@ class AmoCRM extends Api {
             .then((res) => res.data);
     });
 
-
+    updateDeal = this.authChecker((data: LeadData) => {
+        return axios
+            .patch<LeadData>(`${this.ROOT_PATH}/api/v4/leads`, [data], {
+                headers: {
+                    Authorization: `Bearer ${this.ACCESS_TOKEN}`,
+                },
+            }).then((res) => res.data)
+    })
 }
 
 
