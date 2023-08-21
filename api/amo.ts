@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import config from "../config";
 import querystring from "querystring";
 import fs from "fs";
@@ -8,6 +8,10 @@ import {
     getUserLogger
 } from "../logger";
 import log4js from "log4js"
+import {LeadData} from "../types/lead/lead";
+import {Contact} from "../types/contacts/contact";
+import {CreatedTask} from "../types/task/task";
+import {AccountSettings} from "../types/accountSettings/accountSettings";
 
 
 axiosRetry(axios, {retries: 3, retryDelay: axiosRetry.exponentialDelay});
@@ -102,8 +106,8 @@ class AmoCRM extends Api {
             .post(`${this.ROOT_PATH}/oauth2/access_token`, {
                 client_id: config.CLIENT_ID,
                 client_secret: config.CLIENT_SECRET,
-                grant_type: "REFRESH_TOKEN",
-                REFRESH_TOKEN: this.REFRESH_TOKEN,
+                grant_type: "refresh_token",
+                refresh_token: this.REFRESH_TOKEN,
                 redirect_uri: config.REDIRECT_URI,
             })
             .then((res) => {
@@ -120,17 +124,20 @@ class AmoCRM extends Api {
             });
     };
 
-    getAccountData = this.authChecker(() => {
-        return axios.get<any>(`${this.ROOT_PATH}/api/v4/account`, {
+    getAccountData = this.authChecker((withParam: string[] = []) => {
+        return axios.get<AccountSettings>(`${this.ROOT_PATH}/api/v4/account?${querystring.encode({
+            with: withParam.join(","),
+        })}`, {
             headers: {
                 Authorization: `Bearer ${this.ACCESS_TOKEN}`,
             },
         }).then((res) => res.data)
     })
 
+
     getDeal = this.authChecker((id, withParam = []) => {
         return axios
-            .get(
+            .get<LeadData>(
                 `${this.ROOT_PATH}/api/v4/leads/${id}?${querystring.encode({
                     with: withParam.join(","),
                 })}`,
@@ -146,7 +153,7 @@ class AmoCRM extends Api {
     // Получить контакт по id
     getContact = this.authChecker((id) => {
         return axios
-            .get(`${this.ROOT_PATH}/api/v4/contacts/${id}`, {
+            .get<Contact>(`${this.ROOT_PATH}/api/v4/contacts/${id}`, {
                 headers: {
                     Authorization: `Bearer ${this.ACCESS_TOKEN}`,
                 },
@@ -164,6 +171,17 @@ class AmoCRM extends Api {
             })
             .then((res) => res.data);
     });
+
+    updateDeal = this.authChecker((data: LeadData) => {
+        return axios
+            .patch<LeadData>(`${this.ROOT_PATH}/api/v4/leads`, [data], {
+                headers: {
+                    Authorization: `Bearer ${this.ACCESS_TOKEN}`,
+                },
+            }).then((res) => res.data)
+    })
+
 }
 
-export default AmoCRM; 
+
+export default AmoCRM;
