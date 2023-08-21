@@ -20,37 +20,53 @@ app.use(express.urlencoded({extended: true}));
 const SERVICES_LIST_ID = '919003'
 
 const amo = new AmoCRM(config.SUB_DOMAIN, config.AUTH_CODE)
+const countDealPrice = (selectedServicesList: CustomFieldValue[], contactPrices: CustomField[]) => {
+    return selectedServicesList.reduce((price, {value}) => {
+        const servicePrice = contactPrices.find((contactPrice) => contactPrice.field_name === value)
+        if (!servicePrice)
+            throw new Error("У контакта не указана стоимость одной из услуг")
+        return price + Number(servicePrice.values[0].value)
+    }, 0)
+}
 
 
-// const countDealPrice = (selectedServicesList: DealCustomField[], contactPrices: CustomField[]) => {
-//     selectedServicesList.reduce((accum, service) => {
-//         contactPrices.includes(service.name)
-//         return accum
-//     }, 0)
-//     return 0
-// }
+app.get('/', (req, res) => res.send("pong"))
 
 amo.getAccessToken().then(() => {
 
     app.post('/deal-hook', async (req: TypedRequestBody<DealHookBody>, res: Response) => {
+        try {
+            const [deal] = (req.body.leads.update || req.body.leads.add)
+            const {contacts} = (await amo.getDeal(deal.id, ['contacts']))._embedded
+            const mainContact = contacts.find((contact: EmbeddedContact) => contact.is_main)
 
-        const deal = (req.body.leads.update || req.body.leads.add)[0]
+            if (!mainContact) {
+                throw new Error("К сделке не прикреплено ни одного контакта")
+            }
 
-        const {contacts} = (await amo.getDeal(deal.id, ['contacts']))._embedded
+            const contactData = (await amo.getContact(mainContact.id) as Contact).custom_fields_values
 
-        const mainContact = contacts.find((contact: EmbeddedContact) => contact.is_main)
+            if (!contactData) {
+                throw new Error("У контакта не указана стоимость услуг")
+            }
 
-        if (mainContact) {
+            const services = deal.custom_fields.find((customField) => customField.id === SERVICES_LIST_ID)
 
-            const contactData = await amo.getContact(mainContact.id) as Contact
-            const dealPrice = countDealPrice(deal.custom_fields, contactData.custom_fields_values as CustomField[])
+            if (!services) {
+                throw new Error("В сделке не выбрана ни одна услуга")
+            }
+            const price = countDealPrice(services.values, contactData)
 
-            // console.log(contactData.custom_fields_values ? contactData.custom_fields_values : 'huy')
-            // console.log(deal.custom_fields.find(field => field.id === SERVICES_LIST_ID)?.values)
-        } else {
-            console.log("Нет контактов")
+            if (price !== Number(deal.price))
+                await amo.updateDeal({id: Number(deal.id), price})
+
+            return res.json({message: "OK"})
+
+        } catch (e: unknown) {
+            console.log(e)
             res.json({message: "За сделкой не закреплено ни одного контакта"})
         }
+
     })
 
     app.listen(config.PORT, () => {
