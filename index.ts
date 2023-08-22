@@ -102,6 +102,33 @@ amo.getAccessToken().then(() => {
         }
     })
 
+    app.post('/task-hook', async (req: TypedRequestBody<TaskHookBody>, res) => {
+        try {
+
+            console.log('task-hook')
+
+            const [{element_id: dealId}] = req.body.task.update
+
+            const createdNote: CreatedNote = {
+                entity_id: Number(dealId),
+                note_type: 'common',
+                params: {
+                    text: TASK_NOTE_TEXT
+                }
+            }
+
+            await amo.createNotes('leads', [createdNote])
+
+            return res.json({message: 'OK'})
+
+        } catch (e: unknown) {
+
+            mainLogger.error((e as Error).message)
+
+            return res.json({message: 'Error'})
+        }
+    })
+
     app.listen(config.PORT, () => {
         mainLogger.debug('Server started on', config.PORT)
     })

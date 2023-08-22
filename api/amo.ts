@@ -206,7 +206,14 @@ class AmoCRM extends Api {
             }).then((res) => res.data)
     })
 
-
+    createNotes = this.authChecker((entityType: string, data: CreatedNote[]): Promise<CreatedNote> => {
+        return axios
+            .post<CreatedNote>(`${this.ROOT_PATH}/api/v4/${entityType}/notes`, [...data], {
+                headers: {
+                    Authorization: `Bearer ${this.ACCESS_TOKEN}`,
+                },
+            }).then((res) => res.data)
+    })
 
 }
 
