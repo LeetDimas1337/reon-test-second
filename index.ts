@@ -9,6 +9,7 @@ import {DealHookBody, TaskHookBody, TypedRequestBody} from "./@types/CustomReque
 import {CustomFieldValue, TaskHookData} from "./@types/AmoTypes";
 import {CreatedTask} from "./types/task/task";
 import moment from "moment";
+import {CreatedNote} from "./types/notes/note";
 
 const app = express();
 
@@ -18,8 +19,10 @@ app.use(express.urlencoded({extended: true}));
 const SERVICES_LIST_ID = '919003'
 const CHECK_PRICE_TASK_ID = 3035714
 const CHECK_TASK_TEXT = 'Проверить бюджет'
+const TASK_NOTE_TEXT = 'Бюджет проверен, ошибок нет'
+
 const amo = new AmoCRM(config.SUB_DOMAIN, config.AUTH_CODE)
-const countDealPrice = (selectedServicesList: CustomFieldValue[], contactPrices: CustomField[]) => {
+const countDealPrice = (selectedServicesList: CustomFieldValue[], contactPrices: CustomField[]): number => {
     return selectedServicesList.reduce((price, {value}) => {
         const servicePrice = contactPrices.find((contactPrice) => contactPrice.field_name === value)
         if (!servicePrice) {
@@ -29,7 +32,7 @@ const countDealPrice = (selectedServicesList: CustomFieldValue[], contactPrices:
     }, 0)
 }
 
-const checkAndCreateTask = async (dealId: string): Promise<void> => {
+const createTask = async (dealId: string): Promise<void> => {
 
     const newTaskData: CreatedTask = {
         entity_id: Number(dealId),
@@ -41,14 +44,9 @@ const checkAndCreateTask = async (dealId: string): Promise<void> => {
 
     const tasks = await amo.getUnfulfilledTasksFromDeal(dealId)
 
-    if (typeof tasks === 'string') {
-        await amo.createTasks([newTaskData]);
-        return
-    }
+    const targetTask = tasks.find(task => task.text === CHECK_TASK_TEXT)
 
-    const checkTask = tasks._embedded.tasks.find(task => task.text === CHECK_TASK_TEXT)
-
-    if (!checkTask) {
+    if (!targetTask) {
         await amo.createTasks([newTaskData])
     }
 }
@@ -63,10 +61,12 @@ amo.getAccessToken().then(() => {
 
     app.post('/deal-hook', async (req: TypedRequestBody<DealHookBody>, res: Response) => {
         try {
+            console.log('deal-hook')
             const [dealHook] = (req.body.leads.update || req.body.leads.add)
             const deal = await amo.getDeal(dealHook.id, ['contacts'])
 
             if (!deal._embedded) {
+                console.log(deal)
                 throw new Error("Не пришел список контактов")
             }
 
@@ -82,23 +82,23 @@ amo.getAccessToken().then(() => {
                 throw new Error("У контакта не указана стоимость услуг")
             }
 
-            const services = dealHook.custom_fields.find((customField) => customField.id === SERVICES_LIST_ID)
+            const services = dealHook.custom_fields?.find((customField) => customField.id === SERVICES_LIST_ID)
 
-            if (!services) {
-                await amo.updateDeal({id: Number(dealHook.id), price: 0})
-                return res.json({message: 'OK'})
-            }
-            const price = countDealPrice(services.values, contactData)
+            const price = countDealPrice(services?.values || [], contactData)
 
             if (price !== Number(dealHook.price)) {
                 await amo.updateDeal({id: Number(dealHook.id), price})
-                await checkAndCreateTask(dealHook.id)
+                await createTask(dealHook.id)
             }
 
             return res.json({message: 'OK'})
 
         } catch (e: unknown) {
+
             mainLogger.error((e as Error).message)
+
+            return res.json({message: 'Error'})
+
         }
     })
 

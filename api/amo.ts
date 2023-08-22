@@ -10,11 +10,12 @@ import {
 import log4js from "log4js"
 import {LeadData} from "../types/lead/lead";
 import {Contact} from "../types/contacts/contact";
-import {CreatedTask, Task} from "../types/task/task";
+import {CreatedTask, EditedTask, Task} from "../types/task/task";
 import {AccountSettings} from "../types/accountSettings/accountSettings";
 import {TaskList} from "../types/task/taskList";
 import {Lead} from "../types/embeddedEntities/embeddedEntities";
 import {Company} from "../types/companies/company";
+import {CreatedNote} from "../types/notes/note";
 
 
 axiosRetry(axios, {retries: 3, retryDelay: axiosRetry.exponentialDelay});
@@ -175,14 +176,16 @@ class AmoCRM extends Api {
             .then((res) => res.data);
     });
 
-    getUnfulfilledTasksFromDeal = this.authChecker((entityId: string): Promise<TaskList | string> => {
+    getUnfulfilledTasksFromDeal = this.authChecker((entityId: string): Promise<Task[]> => {
         return axios
-            .get(`${this.ROOT_PATH}/api/v4/tasks?filter[is_completed]=0&filter[entity_id]=${entityId}`, {
+            .get<TaskList>(`${this.ROOT_PATH}/api/v4/tasks?filter[is_completed]=0&filter[entity_id]=${entityId}`, {
                 headers: {
                     Authorization: `Bearer ${this.ACCESS_TOKEN}`,
                 },
             })
-            .then((res) => res.data);
+            .then((res) => {
+                return res.data ? res.data._embedded.tasks : []
+            });
     })
 
     updateDeal = this.authChecker((data: LeadData): Promise<LeadData> => {
@@ -202,6 +205,8 @@ class AmoCRM extends Api {
                 },
             }).then((res) => res.data)
     })
+
+
 
 }
 
