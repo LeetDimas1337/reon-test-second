@@ -4,10 +4,10 @@ import {
 	getDateUnixValue,
 	getFieldValue,
 	getFieldValues,
-	getHuminizeTimeFromUnix,
+	getHumanizeTimeFromUnix,
 	getSanationMultiselectFields,
 	getUniqNumbers,
-	getUnixBithdate,
+	getUnixBitrthDate,
 	makeField
 } from "../../utils"
 import {
@@ -143,24 +143,24 @@ describe('Test function makeField on return correct value', () => {
 
 describe('Test function getHuminizeTimeFromUnix on return correct value', () => {
 	it('Return needed length', () => {
-		expect(getHuminizeTimeFromUnix(Math.floor(Date.now() / 1000)).length).toBe(23)
+		expect(getHumanizeTimeFromUnix(Math.floor(Date.now() / 1000)).length).toBe(23)
 	})
 
 	it('Return needed humanize string', () => {
 		humanizeDate.forEach(item => {
-			expect(getHuminizeTimeFromUnix(Number(item.input))).toBe(item.output)
+			expect(getHumanizeTimeFromUnix(Number(item.input))).toBe(item.output)
 		})
 	})
 })
 
 describe('Test function getUnixBithdate on return correct value', () => {
 	it('Return NaN with empty argument', () => {
-		expect(getUnixBithdate('')).toBeNaN()
+		expect(getUnixBitrthDate('')).toBeNaN()
 	})
 
 	it('Return time in unix format', () => {
 		unixDates.forEach(item => {
-			expect(getUnixBithdate(item.input)).toBe(Number(item.output))
+			expect(getUnixBitrthDate(item.input)).toBe(Number(item.output))
 		})
 	})
 })
