@@ -37,14 +37,14 @@ const makeField = (field_id: number, value?: string | number | boolean, enum_id?
     };
 };
 
-const getHuminizeTimeFromUnix = (unixTimeStamp: number) => {
+const getHumanizeTimeFromUnix = (unixTimeStamp: number) => {
     // Принимаем в секундах, моменту нужны миллисекунды
     const time = unixTimeStamp * 1000;
     return moment(time).format("YYYY-MM-DD HH:mm:ss.SSS")
 };
 
-const getUnixBithdate = (date: string) => {
-    const unix = moment(date, "DD.MM.YYYY").utcOffset(0).unix();
+const getUnixBirthDate = (date: string) => {
+    const unix = moment(date, "DD.MM.YYYY").utcOffset(-3).unix();
     return unix;
 };
 
@@ -66,9 +66,9 @@ export {
     getFieldValue,
     getFieldValues,
     makeField,
-    getUnixBithdate,
+    getUnixBirthDate,
     getDateUnixValue,
     getTodayDateTime,
     getUniqNumbers,
-    getHuminizeTimeFromUnix
+    getHumanizeTimeFromUnix
 };
