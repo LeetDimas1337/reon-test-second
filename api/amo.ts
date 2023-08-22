@@ -10,8 +10,11 @@ import {
 import log4js from "log4js"
 import {LeadData} from "../types/lead/lead";
 import {Contact} from "../types/contacts/contact";
-import {CreatedTask} from "../types/task/task";
+import {CreatedTask, Task} from "../types/task/task";
 import {AccountSettings} from "../types/accountSettings/accountSettings";
+import {TaskList} from "../types/task/taskList";
+import {Lead} from "../types/embeddedEntities/embeddedEntities";
+import {Company} from "../types/companies/company";
 
 
 axiosRetry(axios, {retries: 3, retryDelay: axiosRetry.exponentialDelay});
@@ -135,7 +138,7 @@ class AmoCRM extends Api {
     })
 
 
-    getDeal = this.authChecker((id, withParam = []) => {
+    getDeal = this.authChecker((id: string, withParam: string[] = []): Promise<LeadData> => {
         return axios
             .get<LeadData>(
                 `${this.ROOT_PATH}/api/v4/leads/${id}?${querystring.encode({
@@ -151,7 +154,7 @@ class AmoCRM extends Api {
     });
 
     // Получить контакт по id
-    getContact = this.authChecker((id) => {
+    getContact = this.authChecker((id: string): Promise<Contact> => {
         return axios
             .get<Contact>(`${this.ROOT_PATH}/api/v4/contacts/${id}`, {
                 headers: {
@@ -162,7 +165,7 @@ class AmoCRM extends Api {
     });
 
     // Получить компанию по id
-    getCompany = this.authChecker((id) => {
+    getCompany = this.authChecker((id: string): Promise<Company> => {
         return axios
             .get(`${this.ROOT_PATH}/api/v4/companies/${id}`, {
                 headers: {
@@ -172,9 +175,28 @@ class AmoCRM extends Api {
             .then((res) => res.data);
     });
 
-    updateDeal = this.authChecker((data: LeadData) => {
+    getUnfulfilledTasksFromDeal = this.authChecker((entityId: string): Promise<TaskList | string> => {
+        return axios
+            .get(`${this.ROOT_PATH}/api/v4/tasks?filter[is_completed]=0&filter[entity_id]=${entityId}`, {
+                headers: {
+                    Authorization: `Bearer ${this.ACCESS_TOKEN}`,
+                },
+            })
+            .then((res) => res.data);
+    })
+
+    updateDeal = this.authChecker((data: LeadData): Promise<LeadData> => {
         return axios
             .patch<LeadData>(`${this.ROOT_PATH}/api/v4/leads`, [data], {
+                headers: {
+                    Authorization: `Bearer ${this.ACCESS_TOKEN}`,
+                },
+            }).then((res) => res.data)
+    })
+
+    createTasks = this.authChecker((data: CreatedTask[]): Promise<CreatedTask> => {
+        return axios
+            .post<CreatedTask>(`${this.ROOT_PATH}/api/v4/tasks`, [...data], {
                 headers: {
                     Authorization: `Bearer ${this.ACCESS_TOKEN}`,
                 },
