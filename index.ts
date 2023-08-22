@@ -5,9 +5,10 @@ import config from "./config";
 import {Response} from "express";
 import {CustomField} from "./types/customField/customField";
 import {Contact as EmbeddedContact} from "./types/embeddedEntities/embeddedEntities";
-import {DealHookBody, TypedRequestBody} from "./@types/CustomRequest";
-import {CustomFieldValue} from "./@types/AmoTypes";
+import {DealHookBody, TaskHookBody, TypedRequestBody} from "./@types/CustomRequest";
+import {CustomFieldValue, TaskHookData} from "./@types/AmoTypes";
 import {CreatedTask} from "./types/task/task";
+import moment from "moment";
 
 const app = express();
 
@@ -30,31 +31,31 @@ const countDealPrice = (selectedServicesList: CustomFieldValue[], contactPrices:
 
 const checkAndCreateTask = async (dealId: string): Promise<void> => {
 
-    const newTaskData = {
+    const newTaskData: CreatedTask = {
         entity_id: Number(dealId),
         entity_type: 'leads',
         task_type_id: CHECK_PRICE_TASK_ID,
         text: CHECK_TASK_TEXT,
         complete_till: getDeadlineTime(1)
-    } as CreatedTask
+    }
 
     const tasks = await amo.getUnfulfilledTasksFromDeal(dealId)
 
     if (typeof tasks === 'string') {
-        await amo.createTasks([newTaskData])
-    } else {
-        const checkTask = tasks._embedded.tasks.find(task => task.text === CHECK_TASK_TEXT)
-        if (!checkTask) {
-            await amo.createTasks([newTaskData])
-        }
+        await amo.createTasks([newTaskData]);
+        return
     }
 
+    const checkTask = tasks._embedded.tasks.find(task => task.text === CHECK_TASK_TEXT)
+
+    if (!checkTask) {
+        await amo.createTasks([newTaskData])
+    }
 }
 
 const getDeadlineTime = (days: number): number => {
-    return Math.floor((Date.now() + days * 1000 * 3600 * 24) / 1000)
+    return moment().add(days, 'days').unix()
 }
-
 
 app.get('/', (req, res) => res.send("pong"))
 
@@ -62,7 +63,6 @@ amo.getAccessToken().then(() => {
 
     app.post('/deal-hook', async (req: TypedRequestBody<DealHookBody>, res: Response) => {
         try {
-
             const [dealHook] = (req.body.leads.update || req.body.leads.add)
             const deal = await amo.getDeal(dealHook.id, ['contacts'])
 
@@ -100,7 +100,6 @@ amo.getAccessToken().then(() => {
         } catch (e: unknown) {
             mainLogger.error((e as Error).message)
         }
-
     })
 
     app.listen(config.PORT, () => {
