@@ -12,7 +12,16 @@ export type CustomFieldValue = {
 
 export type DealHookData = {
     id: string
-    custom_fields: DealCustomField[]
+    custom_fields?: DealCustomField[]
     price: string
     _embedded: Contact[]
 }
+
+export type TaskHookData = {
+    id: string
+    task_type: string
+    text: string
+    element_id: string
+}
+
+
